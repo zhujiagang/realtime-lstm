@@ -42,7 +42,7 @@ print (day)
 
 def main():
     global my_dict, keys, k_len, arr, xxx, args, log_file, best_prec1
-
+    relative_path = '/data4/lilin/my_code'
     parser = argparse.ArgumentParser(description='Single Shot MultiBox Detector Training')
     parser.add_argument('--version', default='v2', help='conv11_2(v2) or pool6(v1) as last layer')
     parser.add_argument('--basenet', default='vgg16_reducedfc.pth', help='pretrained base model')
@@ -57,7 +57,7 @@ def main():
     parser.add_argument('--man_seed', default=123, type=int, help='manualseed for reproduction')
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
-    parser.add_argument('--lr', '--learning-rate', default=0.000005, type=float, help='initial learning rate')
+    parser.add_argument('--lr', '--learning-rate', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
     parser.add_argument('--stepvalues', default='70000,90000', type=str,
                         help='iter number when learning rate to be dropped')
@@ -65,15 +65,15 @@ def main():
     parser.add_argument('--gamma', default=0.2, type=float, help='Gamma update for SGD')
     parser.add_argument('--log_iters', default=True, type=bool, help='Print the loss at each iteration')
     parser.add_argument('--visdom', default=False, type=str2bool, help='Use visdom to for loss visualization')
-    parser.add_argument('--data_root', default='/home2/lin_li/zjg_code/realtime/', help='Location of VOC root directory')
-    parser.add_argument('--save_root', default='/home2/lin_li/zjg_code/realtime/saveucf24/',
+    parser.add_argument('--data_root', default= relative_path + '/realtime/', help='Location of VOC root directory')
+    parser.add_argument('--save_root', default= relative_path + '/realtime/saveucf24/',
                         help='Location to save checkpoint models')
     parser.add_argument('--iou_thresh', default=0.5, type=float, help='Evaluation threshold')
     parser.add_argument('--conf_thresh', default=0.01, type=float, help='Confidence threshold for evaluation')
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default="/home2/lin_li/zjg_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-00005_train_ssd_conv_lstm_01-11_epoch_25_model_best.pth.tar",
+    parser.add_argument('--resume', default=None,
                         type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
@@ -175,26 +175,27 @@ def main():
 
     print('Initializing weights for extra layers and HEADs...')
     # initialize newly added layers' weights with xavier method
-    # if args.Finetune_SSD is False:
-    #     net.extras.apply(weights_init)
-    #     net.loc.apply(weights_init)
-    #     net.conf.apply(weights_init)
+    if args.Finetune_SSD is False and args.resume is None:
+        print ("init layers")
+        net.extras.apply(weights_init)
+        net.loc.apply(weights_init)
+        net.conf.apply(weights_init)
 
     parameter_dict = dict(net.named_parameters()) # Get parmeter of network in dictionary format wtih name being key
     params = []
 
     #Set different learning rate to bias layers and set their weight_decay to 0
     for name, param in parameter_dict.items():
-        # if name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
-        #     param.requires_grad = False
-        #     print(name, 'layer parameters will be fixed')
-        # else:
-        if name.find('bias') > -1:
-            print(name, 'layer parameters will be trained @ {}'.format(args.lr*2))
-            params += [{'params': [param], 'lr': args.lr*2, 'weight_decay': 0}]
+        if name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
+            param.requires_grad = False
+            print(name, 'layer parameters will be fixed')
         else:
-            print(name, 'layer parameters will be trained @ {}'.format(args.lr))
-            params += [{'params':[param], 'lr': args.lr, 'weight_decay':args.weight_decay}]
+            if name.find('bias') > -1:
+                print(name, 'layer parameters will be trained @ {}'.format(args.lr*2))
+                params += [{'params': [param], 'lr': args.lr*2, 'weight_decay': 0}]
+            else:
+                print(name, 'layer parameters will be trained @ {}'.format(args.lr))
+                params += [{'params':[param], 'lr': args.lr, 'weight_decay':args.weight_decay}]
 
     optimizer = optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = MultiBoxLoss(args.num_classes, 0.5, True, 0, True, 3, 0.5, False, args.cuda)
