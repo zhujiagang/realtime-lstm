@@ -11,7 +11,7 @@
 
 import os
 import random
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -57,10 +57,11 @@ def main():
     parser.add_argument('--man_seed', default=123, type=int, help='manualseed for reproduction')
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
-    parser.add_argument('--lr', '--learning-rate', default=0.0005, type=float, help='initial learning rate')
+    parser.add_argument('--base_lr', default=0.001, type=float, help='initial learning rate')
+    parser.add_argument('--lr', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
-    parser.add_argument('--stepvalues', default='70000,90000', type=str,
-                        help='iter number when learning rate to be dropped')
+    # parser.add_argument('--step', default='70000,90000', type=str,
+    #                     help='iter number when learning rate to be dropped')
     parser.add_argument('--weight_decay', default=5e-4, type=float, help='Weight decay for SGD')
     parser.add_argument('--gamma', default=0.2, type=float, help='Gamma update for SGD')
     parser.add_argument('--log_iters', default=True, type=bool, help='Print the loss at each iteration')
@@ -85,6 +86,16 @@ def main():
     parser.add_argument('--Finetune_SSD', default=False, type=str)
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                         help='evaluate model on validation set')
+    parser.add_argument(
+        '--step',
+        type=int,
+        default=[10, 20],
+        nargs='+',
+        help='the epoch where optimizer reduce the learning rate')
+    parser.add_argument('--log_lr', default=False, type=str2bool, help='Use cuda to train model')
+
+
+
     print(__file__)
     file_name = (__file__).split('/')[-1]
     file_name = file_name.split('.')[0]
@@ -107,7 +118,7 @@ def main():
     args.means = (104, 117, 123)
     num_classes = len(CLASSES) + 1
     args.num_classes = num_classes
-    args.stepvalues = [int(val) for val in args.stepvalues.split(',')]
+    # args.stepvalues = [int(val) for val in args.stepvalues.split(',')]
     args.loss_reset_step = 30
     args.eval_step = 10000
     args.print_step = 10
@@ -197,11 +208,11 @@ def main():
                 print(name, 'layer parameters will be trained @ {}'.format(args.lr))
                 params += [{'params':[param], 'lr': args.lr, 'weight_decay':args.weight_decay}]
 
-    optimizer = optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
+    optimizer = optim.SGD(params, lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = MultiBoxLoss(args.num_classes, 0.5, True, 0, True, 3, 0.5, False, args.cuda)
-    scheduler = None
+    # scheduler = None
     # scheduler = LogLR(optimizer, lr_milestones=args.lr_milestones, total_epoch=args.epochs)
-    scheduler = MultiStepLR(optimizer, milestones=args.stepvalues, gamma=args.gamma)
+    # scheduler = MultiStepLR(optimizer, milestones=args.stepvalues, gamma=args.gamma)
 
     print('Loading Dataset...')
     train_dataset = UCF24Detection(args.data_root, args.train_sets, SSDAugmentation(args.ssd_dim, args.means),
@@ -234,7 +245,8 @@ def main():
     torch.cuda.synchronize()
     for epoch in range(args.start_epoch, args.epochs):
 
-        train(train_data_loader, net, criterion, optimizer, scheduler, epoch)
+
+        train(train_data_loader, net, criterion, optimizer, epoch)
 
         print('Saving state, epoch:', epoch)
         save_checkpoint({
@@ -278,7 +290,7 @@ def main():
     log_file.close()
 
 
-def train(train_data_loader, net, criterion, optimizer, scheduler, epoch):
+def train(train_data_loader, net, criterion, optimizer, epoch):
     net.train()
     # loss counters
     batch_time = AverageMeter()
@@ -301,6 +313,29 @@ def train(train_data_loader, net, criterion, optimizer, scheduler, epoch):
     batch_iterator = None
     iter_count = 0
     t0 = time.perf_counter()
+
+    def adjust_learning_rate_step_lr(optimizer, epoch, arg):
+        lr = arg.base_lr * (
+            0.1**np.sum(epoch >= np.array(arg.step)))
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+        return lr
+
+    def adjust_learning_rate_log_lr(optimizer, epoch, arg):
+        start = arg.lr_milestones[0]
+        stop = arg.lr_milestones[1]
+        x = np.logspace(start, stop, num=arg.epochs)
+        ratio = x[epoch] / (10 ** start)
+        print("ratio: ", ratio)
+        lr = arg.base_lr * ratio
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+        return lr
+
+    if args.log_lr:
+        args.lr = adjust_learning_rate_log_lr(optimizer, epoch, args)
+    else:
+        args.lr = adjust_learning_rate_step_lr(optimizer, epoch, args)
 
     for iteration in range(len(train_data_loader)):
         if not batch_iterator:
@@ -328,8 +363,8 @@ def train(train_data_loader, net, criterion, optimizer, scheduler, epoch):
                 print("clipping gradient: {} with coef {}".format(total_norm, args.clip_gradient / total_norm))
 
         optimizer.step()
-        if scheduler is not None:
-             scheduler.step()
+        # if scheduler is not None:
+        #      scheduler.step()
 
         loc_loss = loss_l.data[0]
         conf_loss = loss_c.data[0]
