@@ -11,7 +11,7 @@
 
 import os
 import random
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "7"
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -57,7 +57,7 @@ def main():
     parser.add_argument('--man_seed', default=123, type=int, help='manualseed for reproduction')
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
-    parser.add_argument('--base_lr', default=0.001, type=float, help='initial learning rate')
+    parser.add_argument('--base_lr', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--lr', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
     # parser.add_argument('--step', default='70000,90000', type=str,
@@ -74,7 +74,7 @@ def main():
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default=None,
+    parser.add_argument('--resume', default="/data4/lilin/my_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-00050_train_ssd_conv_lstm_02-26_epoch_27_checkpoint.pth.tar",
                         type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
@@ -89,12 +89,10 @@ def main():
     parser.add_argument(
         '--step',
         type=int,
-        default=[35],
+        default=[20,26],
         nargs='+',
         help='the epoch where optimizer reduce the learning rate')
     parser.add_argument('--log_lr', default=False, type=str2bool, help='Use cuda to train model')
-
-
 
     print(__file__)
     file_name = (__file__).split('/')[-1]
@@ -118,7 +116,7 @@ def main():
     args.means = (104, 117, 123)
     num_classes = len(CLASSES) + 1
     args.num_classes = num_classes
-    # args.stepvalues = [int(val) for val in args.stepvalues.split(',')]
+    # args.step = [int(val) for val in args.step.split(',')]
     args.loss_reset_step = 30
     args.eval_step = 10000
     args.print_step = 10
@@ -151,11 +149,11 @@ def main():
         # pretrained_dict_2['vgg.34.bias'] = pretrained_dict['vgg.33.bias']
         # pretrained_dict_2['vgg.34.weight'] = pretrained_dict['vgg.33.weight']
         model_dict.update(pretrained_dict_2) # 3. load the new state dict
-    elif args.resume:
+    elif args.resume is not None:
         if os.path.isfile(args.resume):
             print(("=> loading checkpoint '{}'".format(args.resume)))
             checkpoint = torch.load(args.resume)
-            # args.start_epoch = checkpoint['epoch']
+            args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
             net.load_state_dict(checkpoint['state_dict'])
             print(("=> loaded checkpoint '{}' (epoch {})"
@@ -210,9 +208,9 @@ def main():
 
     optimizer = optim.SGD(params, lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = MultiBoxLoss(args.num_classes, 0.5, True, 0, True, 3, 0.5, False, args.cuda)
-    # scheduler = None
-    # scheduler = LogLR(optimizer, lr_milestones=args.lr_milestones, total_epoch=args.epochs)
-    # scheduler = MultiStepLR(optimizer, milestones=args.stepvalues, gamma=args.gamma)
+
+    scheduler = None
+    # scheduler = MultiStepLR(optimizer, milestones=args.step, gamma=args.gamma)
 
     print('Loading Dataset...')
     train_dataset = UCF24Detection(args.data_root, args.train_sets, SSDAugmentation(args.ssd_dim, args.means),
@@ -246,7 +244,7 @@ def main():
     for epoch in range(args.start_epoch, args.epochs):
 
 
-        train(train_data_loader, net, criterion, optimizer, epoch)
+        train(train_data_loader, net, criterion, optimizer, epoch, scheduler)
 
         print('Saving state, epoch:', epoch)
         save_checkpoint({
@@ -256,8 +254,6 @@ def main():
             'best_prec1': best_prec1,
         }, epoch = epoch)
 
-        #### log lr ###
-        # scheduler.step()
         # evaluate on validation set
         if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1:
             torch.cuda.synchronize()
@@ -290,7 +286,7 @@ def main():
     log_file.close()
 
 
-def train(train_data_loader, net, criterion, optimizer, epoch):
+def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
     net.train()
     # loss counters
     batch_time = AverageMeter()
@@ -363,8 +359,8 @@ def train(train_data_loader, net, criterion, optimizer, epoch):
                 print("clipping gradient: {} with coef {}".format(total_norm, args.clip_gradient / total_norm))
 
         optimizer.step()
-        # if scheduler is not None:
-        #      scheduler.step()
+        if scheduler is not None:
+             scheduler.step()
 
         loc_loss = loss_l.data[0]
         conf_loss = loss_c.data[0]
@@ -380,7 +376,7 @@ def train(train_data_loader, net, criterion, optimizer, epoch):
             batch_time.update(t1 - t0)
 
             print_line = 'Epoch {:02d}/{:02d} Iteration {:06d}/{:06d} loc-loss {:.3f}({:.3f}) cls-loss {:.3f}({:.3f}) ' \
-                         'average-loss {:.3f}({:.3f}) Timer {:0.3f}({:0.3f}) lr {:0.5f}'.format(
+                         'average-loss {:.3f}({:.3f}) Timer {:0.3f}({:0.3f}) lr {:0.6f}'.format(
                 epoch, args.epochs, iteration, len(train_data_loader), loc_losses.val, loc_losses.avg, cls_losses.val,
                 cls_losses.avg, losses.val, losses.avg, batch_time.val, batch_time.avg, args.lr)
 
