@@ -58,7 +58,7 @@ def main():
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--base_lr', default=0.001, type=float, help='initial learning rate')
-    parser.add_argument('--lr', default=0.0005, type=float, help='initial learning rate')
+    parser.add_argument('--lr', default=0.001, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
     # parser.add_argument('--step', default='70000,90000', type=str,
     #                     help='iter number when learning rate to be dropped')
@@ -92,7 +92,7 @@ def main():
         default=[35],
         nargs='+',
         help='the epoch where optimizer reduce the learning rate')
-    parser.add_argument('--log_lr', default=False, type=str2bool, help='Use cuda to train model')
+    parser.add_argument('--log_lr', default=True, type=str2bool, help='Use cuda to train model')
 
 
 
