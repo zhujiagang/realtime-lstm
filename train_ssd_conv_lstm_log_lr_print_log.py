@@ -67,8 +67,8 @@ def main():
     parser.add_argument('--man_seed', default=123, type=int, help='manualseed for reproduction')
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
-    parser.add_argument('--base_lr', default=0.0005, type=float, help='initial learning rate')
-    parser.add_argument('--lr', default=0.0005, type=float, help='initial learning rate')
+    parser.add_argument('--base_lr', default=0.001, type=float, help='initial learning rate')
+    parser.add_argument('--lr', default=0.001, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
     # parser.add_argument('--step', default='70000,90000', type=str,
     #                     help='iter number when learning rate to be dropped')
@@ -102,7 +102,7 @@ def main():
         default=[20,26],
         nargs='+',
         help='the epoch where optimizer reduce the learning rate')
-    parser.add_argument('--log_lr', default=False, type=str2bool, help='Use cuda to train model')
+    parser.add_argument('--log_lr', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument(
         '--print-log',
         type=str2bool,
@@ -278,7 +278,7 @@ def main():
             # remember best prec@1 and save checkpoint
             is_best = mAP > best_prec1
             best_prec1 = max(mAP, best_prec1)
-            print_log(args, 'Saving state, epoch:', epoch)
+            print_log(args, 'Saving state, epoch:'+str(epoch))
             save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
@@ -409,7 +409,7 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
                 cls_losses.reset()
                 losses.reset()
                 batch_time.reset()
-                print_log(args, 'Reset accumulators of ', args.snapshot_pref, ' at', iter_count * args.print_step)
+                print_log(args, 'Reset accumulators of ' + args.snapshot_pref + ' at ' + str(iter_count * args.print_step))
                 iter_count = 0
 
 

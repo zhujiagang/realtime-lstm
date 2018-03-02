@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="87c7e8fe-445a-49d8-a84c-caa6b0c867bf" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/work_dir/temp/log.txt" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train_ssd_conv_lstm.py" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,8 +20,8 @@
       <file leaf-file-name="train_ssd_conv_lstm.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-231">
-              <caret line="385" column="29" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="532" selection-end-column="10" />
+            <state relative-caret-position="350">
+              <caret line="507" column="48" lean-forward="true" selection-start-line="507" selection-start-column="48" selection-end-line="507" selection-end-column="48" />
               <folding>
                 <element signature="e#401#410#0" expanded="true" />
               </folding>
@@ -28,11 +29,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="train_ssd_conv_lstm_log_lr_print_log.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="train_ssd_conv_lstm_log_lr_print_log.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="857">
-              <caret line="532" column="10" lean-forward="false" selection-start-line="532" selection-start-column="10" selection-end-line="532" selection-end-column="10" />
+            <state relative-caret-position="373">
+              <caret line="413" column="0" lean-forward="true" selection-start-line="413" selection-start-column="0" selection-end-line="413" selection-end-column="0" />
               <folding>
                 <element signature="e#401#410#0" expanded="true" />
               </folding>
@@ -40,34 +41,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="train_ssd_conv_lstm_log_lr.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="train_ssd_conv_lstm_log_lr.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1360">
-              <caret line="88" column="24" lean-forward="false" selection-start-line="88" selection-start-column="24" selection-end-line="88" selection-end-column="24" />
+            <state relative-caret-position="170">
+              <caret line="178" column="22" lean-forward="true" selection-start-line="178" selection-start-column="22" selection-end-line="178" selection-end-column="22" />
               <folding>
                 <element signature="e#401#410#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ucf24.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/ucf24.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1547">
-              <caret line="96" column="42" lean-forward="false" selection-start-line="96" selection-start-column="42" selection-end-line="96" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ssd.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ssd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3723">
-              <caret line="227" column="33" lean-forward="false" selection-start-line="227" selection-start-column="33" selection-end-line="227" selection-end-column="33" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -83,17 +64,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>topk</find>
-      <find>jaccard_threshold</find>
-      <find>map</find>
-      <find>mean</find>
-      <find>init</find>
       <find>.si</find>
       <find>eval</find>
       <find>eval_f</find>
       <find>lr_milestones</find>
-      <find>log_l</find>
-      <find>log_lr</find>
       <find>resume</find>
       <find>num_w</find>
       <find>sche</find>
@@ -102,17 +76,24 @@
       <find>scheduler</find>
       <find>lr</find>
       <find>base</find>
-      <find>base_lr</find>
-      <find>log</find>
       <find>log_f</find>
       <find>checkpoint</find>
       <find>save_checkpoint</find>
-      <find>print</find>
       <find>print(</find>
       <find>print_log</find>
       <find>snapshot_pref</find>
       <find>train(</find>
       <find>snapshot_</find>
+      <find>work_dir</find>
+      <find>work</find>
+      <find>base_lr</find>
+      <find>log_lr</find>
+      <find>init</find>
+      <find>drop</find>
+      <find>log_l</find>
+      <find>epoch</find>
+      <find>print</find>
+      <find>log</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -153,8 +134,8 @@
         <option value="$PROJECT_DIR$/train_loglr.py" />
         <option value="$PROJECT_DIR$/data/ucf24.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py" />
-        <option value="$PROJECT_DIR$/train_ssd_conv_lstm.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" />
+        <option value="$PROJECT_DIR$/train_ssd_conv_lstm.py" />
       </list>
     </option>
   </component>
@@ -197,7 +178,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../st-gcn-work/st-gcn-pair" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../st-gcn-work/relation-network" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -267,24 +248,6 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="ssd" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="realtime-lstm" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ssd.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <method />
-    </configuration>
     <configuration default="false" name="train_ssd_conv_lstm" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -298,6 +261,24 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="realtime-lstm" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train_ssd_conv_lstm.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="train_ssd_conv_lstm_log_lr_print_log" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="realtime-lstm" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -372,16 +353,16 @@
       <item index="0" class="java.lang.String" itemvalue="Python.train_loglr" />
       <item index="1" class="java.lang.String" itemvalue="Python.second" />
       <item index="2" class="java.lang.String" itemvalue="Python.spatial_transformer_networks" />
-      <item index="3" class="java.lang.String" itemvalue="Python.ssd" />
-      <item index="4" class="java.lang.String" itemvalue="Python.train_ssd_conv_lstm" />
+      <item index="3" class="java.lang.String" itemvalue="Python.train_ssd_conv_lstm" />
+      <item index="4" class="java.lang.String" itemvalue="Python.train_ssd_conv_lstm_log_lr_print_log" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.train_ssd_conv_lstm" />
-        <item index="1" class="java.lang.String" itemvalue="Python.train_loglr" />
-        <item index="2" class="java.lang.String" itemvalue="Python.second" />
-        <item index="3" class="java.lang.String" itemvalue="Python.spatial_transformer_networks" />
-        <item index="4" class="java.lang.String" itemvalue="Python.ssd" />
+        <item index="1" class="java.lang.String" itemvalue="Python.train_ssd_conv_lstm_log_lr_print_log" />
+        <item index="2" class="java.lang.String" itemvalue="Python.train_loglr" />
+        <item index="3" class="java.lang.String" itemvalue="Python.second" />
+        <item index="4" class="java.lang.String" itemvalue="Python.spatial_transformer_networks" />
       </list>
     </recent_temporary>
   </component>
@@ -402,12 +383,12 @@
     <frame x="0" y="22" width="1920" height="1018" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1421875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43340382" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4513742" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -456,14 +437,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.6/site-packages/torch/tensor.py" />
-    <entry file="file://$PROJECT_DIR$/layers/box_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="173" column="20" lean-forward="false" selection-start-line="173" selection-start-column="20" selection-end-line="173" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/layers/modules/multibox_loss.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="766">
@@ -577,13 +550,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/spatial_transformer_networks.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2295">
-          <caret line="145" column="14" lean-forward="false" selection-start-line="145" selection-start-column="14" selection-end-line="145" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/augmentations.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="517">
@@ -636,14 +602,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/ucf24.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1547">
-          <caret line="96" column="42" lean-forward="false" selection-start-line="96" selection-start-column="42" selection-end-line="96" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../anaconda3/lib/python3.6/site-packages/torch/optim/lr_scheduler.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
@@ -651,18 +609,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/ucf24.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="857">
+          <caret line="96" column="42" lean-forward="false" selection-start-line="96" selection-start-column="42" selection-end-line="96" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ssd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3723">
+        <state relative-caret-position="475">
           <caret line="227" column="33" lean-forward="false" selection-start-line="227" selection-start-column="33" selection-end-line="227" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py">
+    <entry file="file://$PROJECT_DIR$/../../../anaconda3/lib/python3.6/site-packages/torch/nn/modules/conv.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1360">
-          <caret line="88" column="24" lean-forward="false" selection-start-line="88" selection-start-column="24" selection-end-line="88" selection-end-column="24" />
+        <state relative-caret-position="441">
+          <caret line="249" column="42" lean-forward="true" selection-start-line="249" selection-start-column="42" selection-end-line="249" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spatial_transformer_networks.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="38" column="40" lean-forward="false" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda3/lib/python3.6/site-packages/torch/nn/init.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="611">
+          <caret line="207" column="33" lean-forward="false" selection-start-line="207" selection-start-column="33" selection-end-line="207" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="413" column="0" lean-forward="true" selection-start-line="413" selection-start-column="0" selection-end-line="413" selection-end-column="0" />
           <folding>
             <element signature="e#401#410#0" expanded="true" />
           </folding>
@@ -671,18 +661,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-231">
-          <caret line="385" column="29" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="532" selection-end-column="10" />
+        <state relative-caret-position="350">
+          <caret line="507" column="48" lean-forward="true" selection-start-line="507" selection-start-column="48" selection-end-line="507" selection-end-column="48" />
           <folding>
             <element signature="e#401#410#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py">
+    <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="857">
-          <caret line="532" column="10" lean-forward="false" selection-start-line="532" selection-start-column="10" selection-end-line="532" selection-end-column="10" />
+        <state relative-caret-position="170">
+          <caret line="178" column="22" lean-forward="true" selection-start-line="178" selection-start-column="22" selection-end-line="178" selection-end-column="22" />
           <folding>
             <element signature="e#401#410#0" expanded="true" />
           </folding>

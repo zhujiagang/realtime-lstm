@@ -47,7 +47,7 @@ def print_log(arg, str, print_time=True):
         str = "[ " + localtime + ' ] ' + str
     print(str)
     if arg.print_log:
-        with open('{}/log.txt'.format(arg.work_dir), 'a') as f:
+        with open('{}/log.txt'.format(arg.save_root), 'a') as f:
             print(str, file=f)
 
 def main():
@@ -67,7 +67,7 @@ def main():
     parser.add_argument('--man_seed', default=123, type=int, help='manualseed for reproduction')
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
-    parser.add_argument('--base_lr', default=0.0005, type=float, help='initial learning rate')
+    parser.add_argument('--base_lr', default=0.000005, type=float, help='initial learning rate')
     parser.add_argument('--lr', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
     # parser.add_argument('--step', default='70000,90000', type=str,
@@ -84,8 +84,7 @@ def main():
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default="/data4/lilin/my_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-00050_train_ssd_conv_lstm_02-26_epoch_27_checkpoint.pth.tar",
-                        type=str, help='Resume from checkpoint')
+    parser.add_argument('--resume', default="/data4/lilin/my_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-00050_train_ssd_conv_lstm_03-01_epoch_34_model_best.pth.tar",type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
                         help='number of total epochs to run')
@@ -99,7 +98,7 @@ def main():
     parser.add_argument(
         '--step',
         type=int,
-        default=[20,26],
+        default=[35],
         nargs='+',
         help='the epoch where optimizer reduce the learning rate')
     parser.add_argument('--log_lr', default=False, type=str2bool, help='Use cuda to train model')
@@ -109,14 +108,14 @@ def main():
         default=True,
         help='print logging or not')
     parser.add_argument(
-        '--work-dir',
-        default='./work_dir/temp',
-        help='the work folder for storing results')
+        '--end2end',
+        type=str2bool,
+        default=True,
+        help='print logging or not')
 
     ## Parse arguments
     args = parser.parse_args()
-    if not os.path.exists(args.work_dir):
-        os.makedirs(args.work_dir)
+
     print(__file__)
     file_name = (__file__).split('/')[-1]
     file_name = file_name.split('.')[0]
@@ -174,7 +173,8 @@ def main():
         if os.path.isfile(args.resume):
             print_log(args, ("=> loading checkpoint '{}'".format(args.resume)))
             checkpoint = torch.load(args.resume)
-            args.start_epoch = checkpoint['epoch']
+            if args.end2end is False:
+                args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
             net.load_state_dict(checkpoint['state_dict'])
             print_log(args, ("=> loaded checkpoint '{}' (epoch {})"
@@ -216,7 +216,7 @@ def main():
 
     #Set different learning rate to bias layers and set their weight_decay to 0
     for name, param in parameter_dict.items():
-        if name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
+        if args.end2end is False and name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
             param.requires_grad = False
             print_log(args, name + 'layer parameters will be fixed')
         else:
@@ -283,7 +283,7 @@ def main():
             # remember best prec@1 and save checkpoint
             is_best = mAP > best_prec1
             best_prec1 = max(mAP, best_prec1)
-            print_log(args, 'Saving state, epoch:', epoch)
+            print_log(args, 'Saving state, epoch:' +str(epoch))
             save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
@@ -414,7 +414,7 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
                 cls_losses.reset()
                 losses.reset()
                 batch_time.reset()
-                print_log(args, 'Reset accumulators of ', args.snapshot_pref, ' at', iter_count * args.print_step)
+                print_log(args, 'Reset accumulators of ' + args.snapshot_pref + ' at' + str(iter_count * args.print_step))
                 iter_count = 0
 
 
