@@ -47,7 +47,7 @@ def print_log(arg, str, print_time=True):
         str = "[ " + localtime + ' ] ' + str
     print(str)
     if arg.print_log:
-        with open('{}/log.txt'.format(arg.work_dir), 'a') as f:
+        with open('{}/log.txt'.format(arg.save_root), 'a') as f:
             print(str, file=f)
 
 def main():
@@ -108,15 +108,10 @@ def main():
         type=str2bool,
         default=True,
         help='print logging or not')
-    parser.add_argument(
-        '--work-dir',
-        default='./work_dir/temp',
-        help='the work folder for storing results')
 
     ## Parse arguments
     args = parser.parse_args()
-    if not os.path.exists(args.work_dir):
-        os.makedirs(args.work_dir)
+
     print(__file__)
     file_name = (__file__).split('/')[-1]
     file_name = file_name.split('.')[0]
