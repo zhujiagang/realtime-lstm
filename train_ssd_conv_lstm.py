@@ -414,7 +414,8 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
                 cls_losses.reset()
                 losses.reset()
                 batch_time.reset()
-                print_log(args, 'Reset accumulators of ' + args.snapshot_pref + ' at' + str(iter_count * args.print_step))
+                cc = ('Reset accumulators of ' + args.snapshot_pref + ' at' + str(iter_count * args.print_step))
+                print_log(args, cc)
                 iter_count = 0
 
 
