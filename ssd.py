@@ -115,22 +115,20 @@ class SSD(nn.Module):
                 if reset_group[0][0] > 0:
                     temp_x = x[0:reset_group[0][0]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
-                    len_hid = len(hidden_states[hi])
-                    if len_hid > 0:
-                        temp = [(Variable(hidden_states[hi][0]).cuda(),
-                                 Variable(hidden_states[hi][1]).cuda())]
-                        xxx = CLSTM(xx, temp)
-                    else:
-                        xxx = CLSTM(xx)
-                    hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
+                    # len_hid = len(hidden_states[hi])
+                    # if len_hid > 0:
+                    #     temp = [(Variable(hidden_states[hi][0]).cuda(),
+                    #              Variable(hidden_states[hi][1]).cuda())]
+                    xxx = CLSTM(xx)
+                    # hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
                     yyy.append(xxx[1].data)
 
                 for item in reset_group:
-                    hidden_states[hi] = []
+                    # hidden_states[hi] = []
                     temp_x = x[item[0]:item[1]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
                     xxx = CLSTM(xx)
-                    hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
+                    # hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
                     yyy.append(xxx[1].data)
 
                 third_tensor = yyy[0]
@@ -144,15 +142,15 @@ class SSD(nn.Module):
                 return x
             else:
                 xx = x.view(-1, x.size(0), x.size(1), x.size(2), x.size(3))
-                len_hid = len(hidden_states[hi])
-                if len_hid > 0:
-                    temp = [(Variable(hidden_states[hi][0]).cuda(), Variable(hidden_states[hi][1]).cuda())]
-                    xxx = CLSTM(xx, temp)
-                else:
-                    xxx = CLSTM(xx)
+                # len_hid = len(hidden_states[hi])
+                # if len_hid > 0:
+                #     temp = [(Variable(hidden_states[hi][0]).cuda(), Variable(hidden_states[hi][1]).cuda())]
+                #     xxx = CLSTM(xx, temp)
+                # else:
+                xxx = CLSTM(xx)
 
                 yyy = xxx[1]
-                hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
+                # hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
 
                 yyyy = F.relu(yyy, inplace=True)
                 x = yyyy.view(x.size())
@@ -165,21 +163,21 @@ class SSD(nn.Module):
                 if reset_group[0][0] > 0:
                     temp_x = x[0:reset_group[0][0]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
-                    len_hid = len(hidden_states[hi])
-                    if len_hid > 0:
-                        temp = [(Variable(hidden_states[hi]).cuda())]
-                        xxx = CGRU(xx, temp)
-                    else:
-                        xxx = CGRU(xx)
-                    hidden_states[hi] = xxx[0][0].data
+                    # len_hid = len(hidden_states[hi])
+                    # if len_hid > 0:
+                    #     temp = [(Variable(hidden_states[hi]).cuda())]
+                    #     xxx = CGRU(xx, temp)
+                    # else:
+                    xxx = CGRU(xx)
+                    # hidden_states[hi] = xxx[0][0].data
                     yyy.append(xxx[1].data)
 
                 for item in reset_group:
-                    hidden_states[hi] = []
+                    # hidden_states[hi] = []
                     temp_x = x[item[0]:item[1]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
                     xxx = CGRU(xx)
-                    hidden_states[hi] = xxx[0][0].data
+                    # hidden_states[hi] = xxx[0][0].data
                     yyy.append(xxx[1].data)
 
                 third_tensor = yyy[0]
@@ -193,15 +191,15 @@ class SSD(nn.Module):
                 return x
             else:
                 xx = x.view(-1, x.size(0), x.size(1), x.size(2), x.size(3))
-                len_hid = len(hidden_states[hi])
-                if len_hid > 0:
-                    temp = [(Variable(hidden_states[hi]).cuda())]
-                    xxx = CGRU(xx, temp)
-                else:
-                    xxx = CGRU(xx)
+                # len_hid = len(hidden_states[hi])
+                # if len_hid > 0:
+                #     temp = [(Variable(hidden_states[hi]).cuda())]
+                #     xxx = CGRU(xx, temp)
+                # else:
+                xxx = CGRU(xx)
 
                 yyy = xxx[1]
-                hidden_states[hi] = xxx[0][0].data
+                # hidden_states[hi] = xxx[0][0].data
 
                 yyyy = F.relu(yyy, inplace=True)
                 x = yyyy.view(x.size())

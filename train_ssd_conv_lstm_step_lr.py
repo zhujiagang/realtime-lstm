@@ -11,7 +11,7 @@
 
 import os
 import random
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -67,11 +67,9 @@ def main():
     parser.add_argument('--man_seed', default=123, type=int, help='manualseed for reproduction')
     parser.add_argument('--cuda', default=True, type=str2bool, help='Use cuda to train model')
     parser.add_argument('--ngpu', default=1, type=str2bool, help='Use cuda to train model')
-    parser.add_argument('--base_lr', default=0.000005, type=float, help='initial learning rate')
+    parser.add_argument('--base_lr', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--lr', default=0.0005, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
-    # parser.add_argument('--step', default='70000,90000', type=str,
-    #                     help='iter number when learning rate to be dropped')
     parser.add_argument('--weight_decay', default=5e-4, type=float, help='Weight decay for SGD')
     parser.add_argument('--gamma', default=0.2, type=float, help='Gamma update for SGD')
     parser.add_argument('--log_iters', default=True, type=bool, help='Print the loss at each iteration')
@@ -84,7 +82,7 @@ def main():
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default="/data4/lilin/my_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-00050_train_ssd_conv_lstm_03-01_epoch_34_model_best.pth.tar",type=str, help='Resume from checkpoint')
+    parser.add_argument('--resume', default=None,type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
                         help='number of total epochs to run')
@@ -98,7 +96,7 @@ def main():
     parser.add_argument(
         '--step',
         type=int,
-        default=[35],
+        default=[18, 27],
         nargs='+',
         help='the epoch where optimizer reduce the learning rate')
     parser.add_argument('--log_lr', default=False, type=str2bool, help='Use cuda to train model')
@@ -110,7 +108,7 @@ def main():
     parser.add_argument(
         '--end2end',
         type=str2bool,
-        default=True,
+        default=False,
         help='print logging or not')
 
     ## Parse arguments
@@ -255,10 +253,10 @@ def main():
     xxx = copy.deepcopy(train_data_loader.dataset.ids)
     # log_file = open(args.save_root + args.snapshot_pref + "_training_" + day + ".log", "w", 1)
     # log_file.write()
-    print_log(args, args.snapshot_pref+'\n')
+    print_log(args, args.snapshot_pref)
     for arg in vars(args):
         print(arg, getattr(args, arg))
-        print_log(args, str(arg)+': '+str(getattr(args, arg))+'\n')
+        print_log(args, str(arg)+': '+str(getattr(args, arg)))
 
     print_log(args, str(net))
 
@@ -293,8 +291,8 @@ def main():
 
             for ap_str in ap_strs:
                 # print(ap_str)
-                print_log(args, ap_str+'\n')
-            ptr_str = '\nMEANAP:::=>'+str(mAP)+'\n'
+                print_log(args, ap_str)
+            ptr_str = '\nMEANAP:::=>'+str(mAP)
             # print(ptr_str)
             # log_file.write()
             print_log(args, ptr_str)
@@ -407,7 +405,7 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
             t0 = time.perf_counter()
             # log_file.write()
             # print(print_line)
-            print_log(args, print_line + '\n')
+            print_log(args, print_line)
             iter_count += 1
             if iter_count % args.loss_reset_step == 0 and iter_count > 0:
                 loc_losses.reset()

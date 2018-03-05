@@ -11,7 +11,7 @@
 
 import os
 import random
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -28,7 +28,7 @@ import time, copy
 from utils.evaluation import evaluate_detections
 from layers.box_utils import decode, nms
 from utils import  AverageMeter
-from torch.optim.lr_scheduler import MultiStepLR, ExponentialLR, LogLR
+# from torch.optim.lr_scheduler import MultiStepLR, ExponentialLR, LogLR
 from torch.nn.utils import clip_grad_norm
 import shutil
 from torch.nn import DataParallel
@@ -39,6 +39,16 @@ def str2bool(v):
 
 day = (time.strftime('%m-%d',time.localtime(time.time())))
 print (day)
+
+
+def print_log(arg, str, print_time=True):
+    if print_time:
+        localtime = time.asctime(time.localtime(time.time()))
+        str = "[ " + localtime + ' ] ' + str
+    print(str)
+    if arg.print_log:
+        with open('{}/log.txt'.format(arg.save_root), 'a') as f:
+            print(str, file=f)
 
 def main():
     global my_dict, keys, k_len, arr, xxx, args, log_file, best_prec1
@@ -60,8 +70,6 @@ def main():
     parser.add_argument('--base_lr', default=0.001, type=float, help='initial learning rate')
     parser.add_argument('--lr', default=0.001, type=float, help='initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
-    # parser.add_argument('--step', default='70000,90000', type=str,
-    #                     help='iter number when learning rate to be dropped')
     parser.add_argument('--weight_decay', default=5e-4, type=float, help='Weight decay for SGD')
     parser.add_argument('--gamma', default=0.2, type=float, help='Gamma update for SGD')
     parser.add_argument('--log_iters', default=True, type=bool, help='Print the loss at each iteration')
@@ -74,8 +82,7 @@ def main():
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default=None,
-                        type=str, help='Resume from checkpoint')
+    parser.add_argument('--resume', default=None,type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
                         help='number of total epochs to run')
@@ -89,19 +96,28 @@ def main():
     parser.add_argument(
         '--step',
         type=int,
-        default=[35],
+        default=[18, 27],
         nargs='+',
         help='the epoch where optimizer reduce the learning rate')
     parser.add_argument('--log_lr', default=True, type=str2bool, help='Use cuda to train model')
+    parser.add_argument(
+        '--print-log',
+        type=str2bool,
+        default=True,
+        help='print logging or not')
+    parser.add_argument(
+        '--end2end',
+        type=str2bool,
+        default=False,
+        help='print logging or not')
 
-
+    ## Parse arguments
+    args = parser.parse_args()
 
     print(__file__)
     file_name = (__file__).split('/')[-1]
     file_name = file_name.split('.')[0]
-    print(file_name)
-    ## Parse arguments
-    args = parser.parse_args()
+    print_log(args, file_name)
     ## set random seeds
     np.random.seed(args.man_seed)
     torch.manual_seed(args.man_seed)
@@ -118,7 +134,7 @@ def main():
     args.means = (104, 117, 123)
     num_classes = len(CLASSES) + 1
     args.num_classes = num_classes
-    # args.stepvalues = [int(val) for val in args.stepvalues.split(',')]
+    # args.step = [int(val) for val in args.step.split(',')]
     args.loss_reset_step = 30
     args.eval_step = 10000
     args.print_step = 10
@@ -126,8 +142,8 @@ def main():
 
     ## Define the experiment Name will used to same directory
     args.snapshot_pref = ('ucf101_CONV-SSD-{}-{}-bs-{}-{}-lr-{:05d}').format(args.dataset,
-                args.modality, args.batch_size, args.basenet[:-14], int(args.lr*100000)) + '_' + file_name + '_' + day
-    print (args.snapshot_pref)
+                args.modality, args.batch_size, args.basenet[:-14], int(args.lr*100000)) # + '_' + file_name + '_' + day
+    print_log(args, args.snapshot_pref)
 
     if not os.path.isdir(args.save_root):
         os.makedirs(args.save_root)
@@ -135,7 +151,7 @@ def main():
     net = build_ssd(300, args.num_classes)
 
     if args.Finetune_SSD is True:
-        print ("load snapshot")
+        print_log(args, "load snapshot")
         pretrained_weights = "/home2/lin_li/zjg_code/realtime/ucf24/rgb-ssd300_ucf24_120000.pth"
         pretrained_dict = torch.load(pretrained_weights)
         model_dict = net.state_dict()  # 1. filter out unnecessary keys
@@ -151,26 +167,27 @@ def main():
         # pretrained_dict_2['vgg.34.bias'] = pretrained_dict['vgg.33.bias']
         # pretrained_dict_2['vgg.34.weight'] = pretrained_dict['vgg.33.weight']
         model_dict.update(pretrained_dict_2) # 3. load the new state dict
-    elif args.resume:
+    elif args.resume is not None:
         if os.path.isfile(args.resume):
-            print(("=> loading checkpoint '{}'".format(args.resume)))
+            print_log(args, ("=> loading checkpoint '{}'".format(args.resume)))
             checkpoint = torch.load(args.resume)
-            # args.start_epoch = checkpoint['epoch']
+            if args.end2end is False:
+                args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
             net.load_state_dict(checkpoint['state_dict'])
-            print(("=> loaded checkpoint '{}' (epoch {})"
+            print_log(args, ("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.evaluate, checkpoint['epoch'])))
         else:
-            print(("=> no checkpoint found at '{}'".format(args.resume)))
+            print_log(args, ("=> no checkpoint found at '{}'".format(args.resume)))
 
     elif args.modality == 'fastOF':
-        print('Download pretrained brox flow trained model weights and place them at:::=> ',args.data_root + 'ucf24/train_data/brox_wieghts.pth')
+        print_log(args, 'Download pretrained brox flow trained model weights and place them at:::=> ' + args.data_root + 'ucf24/train_data/brox_wieghts.pth')
         pretrained_weights = args.data_root + 'train_data/brox_wieghts.pth'
-        print('Loading base network...')
+        print_log(args, 'Loading base network...')
         net.load_state_dict(torch.load(pretrained_weights))
     else:
         vgg_weights = torch.load(args.data_root +'train_data/' + args.basenet)
-        print('Loading base network...')
+        print_log(args, 'Loading base network...')
         net.vgg.load_state_dict(vgg_weights)
 
     if args.cuda:
@@ -184,10 +201,10 @@ def main():
             xavier(m.weight.data)
             m.bias.data.zero_()
 
-    print('Initializing weights for extra layers and HEADs...')
+    print_log(args, 'Initializing weights for extra layers and HEADs...')
     # initialize newly added layers' weights with xavier method
     if args.Finetune_SSD is False and args.resume is None:
-        print ("init layers")
+        print_log(args, "init layers")
         net.extras.apply(weights_init)
         net.loc.apply(weights_init)
         net.conf.apply(weights_init)
@@ -197,24 +214,24 @@ def main():
 
     #Set different learning rate to bias layers and set their weight_decay to 0
     for name, param in parameter_dict.items():
-        if name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
+        if args.end2end is False and name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
             param.requires_grad = False
-            print(name, 'layer parameters will be fixed')
+            print_log(args, name + 'layer parameters will be fixed')
         else:
             if name.find('bias') > -1:
-                print(name, 'layer parameters will be trained @ {}'.format(args.lr*2))
+                print_log(args, name + 'layer parameters will be trained @ {}'.format(args.lr*2))
                 params += [{'params': [param], 'lr': args.lr*2, 'weight_decay': 0}]
             else:
-                print(name, 'layer parameters will be trained @ {}'.format(args.lr))
+                print_log(args, name + 'layer parameters will be trained @ {}'.format(args.lr))
                 params += [{'params':[param], 'lr': args.lr, 'weight_decay':args.weight_decay}]
 
     optimizer = optim.SGD(params, lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = MultiBoxLoss(args.num_classes, 0.5, True, 0, True, 3, 0.5, False, args.cuda)
-    # scheduler = None
-    # scheduler = LogLR(optimizer, lr_milestones=args.lr_milestones, total_epoch=args.epochs)
-    # scheduler = MultiStepLR(optimizer, milestones=args.stepvalues, gamma=args.gamma)
 
-    print('Loading Dataset...')
+    scheduler = None
+    # scheduler = MultiStepLR(optimizer, milestones=args.step, gamma=args.gamma)
+
+    print_log(args, 'Loading Dataset...')
     train_dataset = UCF24Detection(args.data_root, args.train_sets, SSDAugmentation(args.ssd_dim, args.means),
                                    AnnotationTransform(), input_type=args.modality)
     val_dataset = UCF24Detection(args.data_root, 'test', BaseTransform(args.ssd_dim, args.means),
@@ -226,29 +243,29 @@ def main():
     val_data_loader = data.DataLoader(val_dataset, args.batch_size, num_workers=args.num_workers,
                                  shuffle=False, collate_fn=detection_collate, pin_memory=True)
 
-    print ("train epoch_size: ", len(train_data_loader))
-    print('Training SSD on', train_dataset.name)
+    print_log(args, "train epoch_size: " + str(len(train_data_loader)))
+    print_log(args, 'Training SSD on' + train_dataset.name)
 
     my_dict = copy.deepcopy(train_data_loader.dataset.train_vid_frame)
     keys = list(my_dict.keys())
     k_len = len(keys)
     arr = np.arange(k_len)
     xxx = copy.deepcopy(train_data_loader.dataset.ids)
-    log_file = open(args.save_root + args.snapshot_pref + "_training_" + day + ".log", "w", 1)
-    log_file.write(args.snapshot_pref+'\n')
-
+    # log_file = open(args.save_root + args.snapshot_pref + "_training_" + day + ".log", "w", 1)
+    # log_file.write()
+    print_log(args, args.snapshot_pref)
     for arg in vars(args):
         print(arg, getattr(args, arg))
-        log_file.write(str(arg)+': '+str(getattr(args, arg))+'\n')
-    log_file.write(str(net))
+        print_log(args, str(arg)+': '+str(getattr(args, arg)))
+
+    print_log(args, str(net))
 
     torch.cuda.synchronize()
     for epoch in range(args.start_epoch, args.epochs):
 
+        train(train_data_loader, net, criterion, optimizer, epoch, scheduler)
+        print_log(args, 'Saving state, epoch:' + str(epoch))
 
-        train(train_data_loader, net, criterion, optimizer, epoch)
-
-        print('Saving state, epoch:', epoch)
         save_checkpoint({
             'epoch': epoch + 1,
             'arch': args.arch,
@@ -256,8 +273,6 @@ def main():
             'best_prec1': best_prec1,
         }, epoch = epoch)
 
-        #### log lr ###
-        # scheduler.step()
         # evaluate on validation set
         if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1:
             torch.cuda.synchronize()
@@ -266,7 +281,7 @@ def main():
             # remember best prec@1 and save checkpoint
             is_best = mAP > best_prec1
             best_prec1 = max(mAP, best_prec1)
-            print('Saving state, epoch:', epoch)
+            print_log(args, 'Saving state, epoch:' +str(epoch))
             save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
@@ -275,22 +290,24 @@ def main():
             }, is_best,epoch)
 
             for ap_str in ap_strs:
-                print(ap_str)
-                log_file.write(ap_str+'\n')
-            ptr_str = '\nMEANAP:::=>'+str(mAP)+'\n'
-            print(ptr_str)
-            log_file.write(ptr_str)
+                # print(ap_str)
+                print_log(args, ap_str)
+            ptr_str = '\nMEANAP:::=>'+str(mAP)
+            # print(ptr_str)
+            # log_file.write()
+            print_log(args, ptr_str)
 
             torch.cuda.synchronize()
             t0 = time.perf_counter()
             prt_str = '\nValidation TIME::: {:0.3f}\n\n'.format(t0-tvs)
-            print(prt_str)
-            log_file.write(ptr_str)
+            # print(prt_str)
+            # log_file.write(ptr_str)
+            print_log(args, ptr_str)
 
-    log_file.close()
+    # log_file.close()
 
 
-def train(train_data_loader, net, criterion, optimizer, epoch):
+def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
     net.train()
     # loss counters
     batch_time = AverageMeter()
@@ -360,11 +377,11 @@ def train(train_data_loader, net, criterion, optimizer, epoch):
         if args.clip_gradient is not None:
             total_norm = clip_grad_norm(net.parameters(), args.clip_gradient)
             if total_norm > args.clip_gradient:
-                print("clipping gradient: {} with coef {}".format(total_norm, args.clip_gradient / total_norm))
+                print_log(args, "clipping gradient: {} with coef {}".format(total_norm, args.clip_gradient / total_norm))
 
         optimizer.step()
-        # if scheduler is not None:
-        #      scheduler.step()
+        if scheduler is not None:
+             scheduler.step()
 
         loc_loss = loss_l.data[0]
         conf_loss = loss_c.data[0]
@@ -380,27 +397,29 @@ def train(train_data_loader, net, criterion, optimizer, epoch):
             batch_time.update(t1 - t0)
 
             print_line = 'Epoch {:02d}/{:02d} Iteration {:06d}/{:06d} loc-loss {:.3f}({:.3f}) cls-loss {:.3f}({:.3f}) ' \
-                         'average-loss {:.3f}({:.3f}) Timer {:0.3f}({:0.3f}) lr {:0.5f}'.format(
+                         'average-loss {:.3f}({:.3f}) Timer {:0.3f}({:0.3f}) lr {:0.6f}'.format(
                 epoch, args.epochs, iteration, len(train_data_loader), loc_losses.val, loc_losses.avg, cls_losses.val,
                 cls_losses.avg, losses.val, losses.avg, batch_time.val, batch_time.avg, args.lr)
 
             torch.cuda.synchronize()
             t0 = time.perf_counter()
-            log_file.write(print_line + '\n')
-            print(print_line)
+            # log_file.write()
+            # print(print_line)
+            print_log(args, print_line)
             iter_count += 1
             if iter_count % args.loss_reset_step == 0 and iter_count > 0:
                 loc_losses.reset()
                 cls_losses.reset()
                 losses.reset()
                 batch_time.reset()
-                print('Reset accumulators of ', args.snapshot_pref, ' at', iter_count * args.print_step)
+                cc = ('Reset accumulators of ' + args.snapshot_pref + ' at' + str(iter_count * args.print_step))
+                print_log(args, cc)
                 iter_count = 0
 
 
 def validate(args, net, val_data_loader, val_dataset, epoch, iou_thresh=0.5):
     """Test a SSD network on an image database."""
-    print('Validating at ', epoch)
+    print_log(args, 'Validating at ' + str(epoch))
     num_images = len(val_dataset)
     num_classes = args.num_classes
 
@@ -436,7 +455,7 @@ def validate(args, net, val_data_loader, val_dataset, epoch, iou_thresh=0.5):
         if print_time and val_itr%val_step == 0:
             torch.cuda.synchronize()
             tf = time.perf_counter()
-            print('Forward Time {:0.3f}'.format(tf-t1))
+            print_log(args, 'Forward Time {:0.3f}'.format(tf-t1))
         for b in range(batch_size):
             gt = targets[b].numpy()
             gt[:,0] *= width
@@ -482,22 +501,31 @@ def validate(args, net, val_data_loader, val_dataset, epoch, iou_thresh=0.5):
         if val_itr%val_step == 0:
             torch.cuda.synchronize()
             te = time.perf_counter()
-            print('im_detect: {:d}/{:d} time taken {:0.3f}'.format(count, num_images, te-ts))
+            print_log(args, 'im_detect: {:d}/{:d} time taken {:0.3f}'.format(count, num_images, te-ts))
             torch.cuda.synchronize()
             ts = time.perf_counter()
         if print_time and val_itr%val_step == 0:
             torch.cuda.synchronize()
             te = time.perf_counter()
-            print('NMS stuff Time {:0.3f}'.format(te - tf))
-    print('Evaluating detections for epoch number ', epoch)
+            print_log(args, 'NMS stuff Time {:0.3f}'.format(te - tf))
+
+    print_log(args, 'Evaluating detections for epoch number ' + str(epoch))
     return evaluate_detections(gt_boxes, det_boxes, CLASSES, iou_thresh=iou_thresh)
 
 def save_checkpoint(state, is_best = False, epoch = 0):
-    snapshot = args.save_root + args.snapshot_pref + '_epoch_' + str(epoch)
+
+    args.snapshot_pref = ('ucf101_CONV-SSD-{}-{}-bs-{}-{}-lr-{:06d}').format(args.dataset,
+                args.modality, args.batch_size, args.basenet[:-14], int(args.lr*100000))
+
+    localtime = time.asctime(time.localtime(time.time()))
+    str_time = "[ " + localtime + ' ] '
+    snapshot = args.save_root + args.snapshot_pref + '_epoch_' + str(epoch) + str_time
     filename = snapshot + '_checkpoint.pth.tar'
+    print_log(args, "save" + filename)
     torch.save(state, filename)
     if is_best:
         best_name = snapshot + '_model_best.pth.tar'
+        print_log(args, "copy best" + best_name)
         shutil.copyfile(filename, best_name)
 
 if __name__ == '__main__':

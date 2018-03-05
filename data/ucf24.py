@@ -260,12 +260,15 @@ def detection_collate(batch):
             1) (tensor) batch of images stacked on their 0 dim
             2) (list of tensors) annotations for a given image are stacked on 0 dim
     """
-
     targets = []
     imgs = []
     image_ids = []
+    cnt = 0
     for sample in batch:
+        cnt += 1
         imgs.append(sample[0])
         targets.append(torch.FloatTensor(sample[1]))
+        if (cnt%10)==0:
+            sample[2][1] = True
         image_ids.append(sample[2])
     return torch.stack(imgs, 0), targets, image_ids
