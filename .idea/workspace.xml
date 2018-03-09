@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="87c7e8fe-445a-49d8-a84c-caa6b0c867bf" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr.py" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -33,7 +31,7 @@
         <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="313">
-              <caret line="509" column="36" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="537" selection-end-column="10" />
+              <caret line="509" column="36" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="537" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -42,18 +40,8 @@
       <file leaf-file-name="train_ssd_conv_lstm_step_lr_seq_shuffle.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2253">
-              <caret line="448" column="50" lean-forward="true" selection-start-line="448" selection-start-column="50" selection-end-line="448" selection-end-column="50" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ssd.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ssd.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="356">
-              <caret line="100" column="24" lean-forward="false" selection-start-line="100" selection-start-column="24" selection-end-line="100" selection-end-column="24" />
+            <state relative-caret-position="115">
+              <caret line="242" column="21" lean-forward="false" selection-start-line="242" selection-start-column="4" selection-end-line="242" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -70,8 +58,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>print(</find>
-      <find>print_log</find>
       <find>snapshot_pref</find>
       <find>snapshot_</find>
       <find>work_dir</find>
@@ -97,9 +83,11 @@
       <find>base_lr</find>
       <find>[</find>
       <find>is</find>
-      <find>global best_name</find>
       <find>best_name</find>
       <find>random</find>
+      <find>global best_name</find>
+      <find>iteration</find>
+      <find>train_data_loader</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -392,12 +380,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1920" height="1018" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15260416" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13645834" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44820297" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5591966" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -679,26 +666,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ssd.py">
+    <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="356">
-          <caret line="100" column="24" lean-forward="false" selection-start-line="100" selection-start-column="24" selection-end-line="100" selection-end-column="24" />
+        <state relative-caret-position="313">
+          <caret line="509" column="36" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="537" selection-end-column="10" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr.py">
+    <entry file="file://$PROJECT_DIR$/ssd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="509" column="36" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="537" selection-end-column="10" />
+        <state relative-caret-position="-1">
+          <caret line="100" column="24" lean-forward="false" selection-start-line="100" selection-start-column="24" selection-end-line="100" selection-end-column="24" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2253">
-          <caret line="448" column="50" lean-forward="true" selection-start-line="448" selection-start-column="50" selection-end-line="448" selection-end-column="50" />
+        <state relative-caret-position="115">
+          <caret line="242" column="21" lean-forward="false" selection-start-line="242" selection-start-column="4" selection-end-line="242" selection-end-column="21" />
           <folding />
         </state>
       </provider>

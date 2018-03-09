@@ -358,6 +358,10 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
     train_shuffle = []
     ii = 0
     for iteration in range(len(train_data_loader)):
+        # ii += 1
+        # print (ii)
+        # if ii > 100:
+        #     break
         if not batch_iterator:
             batch_iterator = iter(train_data_loader)
         # load train data
@@ -366,7 +370,7 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
 
     random.shuffle(train_shuffle)
 
-    for item in train_shuffle:
+    for iteration, item in enumerate(train_shuffle):
         images = item[0]
         targets = item[1]
         img_indexs = item[2]
