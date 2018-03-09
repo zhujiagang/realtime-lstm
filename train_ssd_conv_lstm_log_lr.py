@@ -33,7 +33,8 @@ from torch.nn.utils import clip_grad_norm
 import shutil
 from torch.nn import DataParallel
 best_prec1 = 0
-
+global best_name
+best_name = None
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
@@ -88,7 +89,7 @@ def main():
                         help='number of total epochs to run')
     parser.add_argument('--eval_freq', default=2, type=int, metavar='N', help='evaluation frequency (default: 5)')
     parser.add_argument('--snapshot_pref', type=str, default="ucf101_vgg16_ssd300_end2end")
-    parser.add_argument('--lr_milestones', default=[-2, -5], type=float, help='initial learning rate')
+    parser.add_argument('--lr_milestones', default=[-2, -4], type=float, help='initial learning rate')
     parser.add_argument('--arch', type=str, default="VGG16")
     parser.add_argument('--Finetune_SSD', default=False, type=str)
     parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
@@ -524,6 +525,9 @@ def save_checkpoint(state, is_best = False, epoch = 0):
     print_log(args, "save" + filename)
     torch.save(state, filename)
     if is_best:
+        global best_name
+        if os.path.isfile(best_name):
+            os.remove(best_name)
         best_name = snapshot + '_model_best.pth.tar'
         print_log(args, "copy best" + best_name)
         shutil.copyfile(filename, best_name)

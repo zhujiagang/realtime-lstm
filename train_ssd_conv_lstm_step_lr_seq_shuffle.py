@@ -355,12 +355,22 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
         args.lr = adjust_learning_rate_log_lr(optimizer, epoch, args)
     else:
         args.lr = adjust_learning_rate_step_lr(optimizer, epoch, args)
-
+    train_shuffle = []
+    ii = 0
     for iteration in range(len(train_data_loader)):
         if not batch_iterator:
             batch_iterator = iter(train_data_loader)
         # load train data
         images, targets, img_indexs = next(batch_iterator)
+        train_shuffle.append([images, targets, img_indexs])
+
+    random.shuffle(train_shuffle)
+
+    for item in train_shuffle:
+        images = item[0]
+        targets = item[1]
+        img_indexs = item[2]
+
         if args.cuda:
             images = Variable(images.cuda())
             targets = [Variable(anno.cuda(), volatile=True) for anno in targets]
