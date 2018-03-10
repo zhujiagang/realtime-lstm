@@ -34,14 +34,16 @@ import shutil
 from torch.nn import DataParallel
 best_prec1 = 0
 global best_name
-best_name = None
+best_name = "first"
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 day = (time.strftime('%m-%d',time.localtime(time.time())))
 print (day)
-
+global this_file_name
+this_file_name = (__file__).split('/')[-1]
+this_file_name = this_file_name.split('.')[0]
 
 def print_log(arg, str, print_time=True):
     if print_time:
@@ -84,7 +86,7 @@ def main():
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default=None,type=str, help='Resume from checkpoint')
+    parser.add_argument('--resume', default="/data4/lilin/my_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-000050_epoch_1[ Fri Mar  9 15:08:54 2018 ] _checkpoint.pth.tar",type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
                         help='number of total epochs to run')
@@ -117,9 +119,8 @@ def main():
     args = parser.parse_args()
 
     print(__file__)
-    file_name = (__file__).split('/')[-1]
-    file_name = file_name.split('.')[0]
-    print_log(args, file_name)
+
+    print_log(args, this_file_name)
     ## set random seeds
     np.random.seed(args.man_seed)
     torch.manual_seed(args.man_seed)
@@ -292,17 +293,17 @@ def main():
             }, is_best,epoch)
 
             for ap_str in ap_strs:
-                # print(ap_str)
+                print(ap_str)
                 print_log(args, ap_str)
             ptr_str = '\nMEANAP:::=>'+str(mAP)
-            # print(ptr_str)
+            print(ptr_str)
             # log_file.write()
             print_log(args, ptr_str)
 
             torch.cuda.synchronize()
             t0 = time.perf_counter()
             prt_str = '\nValidation TIME::: {:0.3f}\n\n'.format(t0-tvs)
-            # print(prt_str)
+            print(prt_str)
             # log_file.write(ptr_str)
             print_log(args, ptr_str)
 
@@ -529,13 +530,13 @@ def validate(args, net, val_data_loader, val_dataset, epoch, iou_thresh=0.5):
     return evaluate_detections(gt_boxes, det_boxes, CLASSES, iou_thresh=iou_thresh)
 
 def save_checkpoint(state, is_best = False, epoch = 0):
-
+    global this_file_name
     args.snapshot_pref = ('ucf101_CONV-SSD-{}-{}-bs-{}-{}-lr-{:06d}').format(args.dataset,
                 args.modality, args.batch_size, args.basenet[:-14], int(args.lr*100000))
 
     localtime = time.asctime(time.localtime(time.time()))
     str_time = "[ " + localtime + ' ] '
-    snapshot = args.save_root + args.snapshot_pref + '_epoch_' + str(epoch) + str_time
+    snapshot = args.save_root + args.snapshot_pref + this_file_name + '_epoch_' + str(epoch) + str_time
     filename = snapshot + '_checkpoint.pth.tar'
     print_log(args, "save" + filename)
     torch.save(state, filename)
