@@ -11,7 +11,7 @@
 
 import os
 import random
-os.environ["CUDA_VISIBLE_DEVICES"] = "6"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import torch
 import torch.nn as nn
 import torch.optim as optim
