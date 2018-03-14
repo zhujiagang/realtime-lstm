@@ -33,7 +33,7 @@ class SSD(nn.Module):
         head: "multibox head" consists of loc and conf conv layers
     """
 
-    def __init__(self, base, extras, clstm, cgru, head, num_classes, use_gru = False):
+    def __init__(self, base, extras, head, num_classes, use_gru = False):
         super(SSD, self).__init__()
 
         self.num_classes = num_classes
@@ -46,6 +46,9 @@ class SSD(nn.Module):
         self.hidden_states = [[]]
         # SSD network
         self.vgg = nn.ModuleList(base)
+        clstm = [CLSTM(512, 512, 3, 1)]
+        cgru = [CGRU(512, 512, 3, 1)]
+
         self.clstm = nn.ModuleList(clstm)
         self.use_gru = use_gru
         if self.use_gru:
@@ -108,52 +111,33 @@ class SSD(nn.Module):
         for k in range(23):
             x = self.vgg[k](x)
 
-        def convlstm_forward(x, CLSTM, hidden_states, hi):
+        def convlstm_forward(x, CLSTM):
             len_r = len(reset_group)
             if len_r > 0:
                 yyy = []
                 if reset_group[0][0] > 0:
                     temp_x = x[0:reset_group[0][0]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
-                    # len_hid = len(hidden_states[hi])
-                    # if len_hid > 0:
-                    #     temp = [(Variable(hidden_states[hi][0]).cuda(),
-                    #              Variable(hidden_states[hi][1]).cuda())]
                     xxx = CLSTM(xx)
-                    # hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
-                    yyy.append(xxx[1].data)
+                    yyy.append(xxx[1])
 
                 for item in reset_group:
-                    # hidden_states[hi] = []
+                    # print (item)
                     temp_x = x[item[0]:item[1]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
                     xxx = CLSTM(xx)
-                    # hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
-                    yyy.append(xxx[1].data)
+                    yyy.append(xxx[1])
 
-                third_tensor = yyy[0]
-                if len(yyy) > 1:
-                    for yitem in yyy[1:]:
-                        third_tensor = torch.cat((third_tensor, yitem), 0)
-
-                yyyy = Variable(third_tensor).cuda()
-                yyyy = F.relu(yyyy, inplace=True)
-                x = yyyy.view(x.size())
+                yyy = torch.cat(yyy, 0)
+                yyy = F.relu(yyy, inplace=True)
+                x = yyy.view(x.size())
                 return x
             else:
                 xx = x.view(-1, x.size(0), x.size(1), x.size(2), x.size(3))
-                # len_hid = len(hidden_states[hi])
-                # if len_hid > 0:
-                #     temp = [(Variable(hidden_states[hi][0]).cuda(), Variable(hidden_states[hi][1]).cuda())]
-                #     xxx = CLSTM(xx, temp)
-                # else:
                 xxx = CLSTM(xx)
-
                 yyy = xxx[1]
-                # hidden_states[hi] = [xxx[0][0][0].data, xxx[0][0][1].data]
-
-                yyyy = F.relu(yyy, inplace=True)
-                x = yyyy.view(x.size())
+                yyy = F.relu(yyy, inplace=True)
+                x = yyy.view(x.size())
                 return x
 
         def convgru_forward(x, CGRU, hidden_states, hi):
@@ -169,16 +153,16 @@ class SSD(nn.Module):
                     #     xxx = CGRU(xx, temp)
                     # else:
                     xxx = CGRU(xx)
-                    # hidden_states[hi] = xxx[0][0].data
-                    yyy.append(xxx[1].data)
+                    # hidden_states[hi] = xxx[0][0]
+                    yyy.append(xxx[1])
 
                 for item in reset_group:
                     # hidden_states[hi] = []
                     temp_x = x[item[0]:item[1]]
                     xx = temp_x.view(-1, temp_x.size(0), temp_x.size(1), temp_x.size(2), temp_x.size(3))
                     xxx = CGRU(xx)
-                    # hidden_states[hi] = xxx[0][0].data
-                    yyy.append(xxx[1].data)
+                    # hidden_states[hi] = xxx[0][0]
+                    yyy.append(xxx[1])
 
                 third_tensor = yyy[0]
                 if len(yyy) > 1:
@@ -199,7 +183,7 @@ class SSD(nn.Module):
                 xxx = CGRU(xx)
 
                 yyy = xxx[1]
-                # hidden_states[hi] = xxx[0][0].data
+                # hidden_states[hi] = xxx[0][0]
 
                 yyyy = F.relu(yyy, inplace=True)
                 x = yyyy.view(x.size())
@@ -208,7 +192,7 @@ class SSD(nn.Module):
         hi = 0
         ##  apply convlstm on conv4_3
         if self.use_gru is False:
-            x = convlstm_forward(x, self.clstm[0], self.hidden_states, hi)
+            x = convlstm_forward(x, self.clstm[0])
         else:
             x = convgru_forward(x, self.cgru[0], self.hidden_states, hi)
 
@@ -275,7 +259,7 @@ def vgg(cfg, i, batch_norm=False):
     layers = []
     in_channels = i
     cnt = 0
-    # clstm_1 = CLSTM(512, 512, 3, 1)
+
     for v in cfg:
         if v == 'M':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
@@ -289,13 +273,10 @@ def vgg(cfg, i, batch_norm=False):
                 layers += [conv2d, nn.ReLU(inplace=True)]
             cnt += 1
             in_channels = v
-        # if cnt == 22:
-        #     layers += [clstm_1]
         cnt += 1
 
     pool5 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
     conv6 = nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6)
-    # clstm_2 = CLSTM(1024, 1024, 3, 1)
     conv7 = nn.Conv2d(1024, 1024, kernel_size=1)
     layers += [pool5, conv6,
                nn.ReLU(inplace=True), conv7, nn.ReLU(inplace=True)]
@@ -319,9 +300,6 @@ def add_extras(cfg, i, batch_norm=False):
                 layers += [nn.Conv2d(in_channels, v, kernel_size=(1, 3)[flag])]
                 in_c = v
 
-            # if flag:
-            #     layers += [CLSTM(in_c, in_c, 3, 1)]
-
             flag = not flag
         in_channels = v
     return layers
@@ -344,10 +322,8 @@ def multibox(vgg, extra_layers, cfg, num_classes):
         conf_layers += [nn.Conv2d(v.out_channels, cfg[k]
                                   * num_classes, kernel_size=3, padding=1)]
 
-    clstm = [CLSTM(512, 512, 3, 1)]
-    cgru = [CGRU(512, 512, 3, 1)]
 
-    return vgg, extra_layers, clstm, cgru, (loc_layers, conf_layers)
+    return vgg, extra_layers, (loc_layers, conf_layers)
 
 
 base = {

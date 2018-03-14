@@ -11,7 +11,7 @@
 
 import os
 import random
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "7"
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -55,7 +55,7 @@ def print_log(arg, str, print_time=True):
             print(str, file=f)
 
 def main():
-    global my_dict, keys, k_len, arr, xxx, args, log_file, best_prec1
+    global args, log_file, best_prec1
     relative_path = '/data4/lilin/my_code'
     parser = argparse.ArgumentParser(description='Single Shot MultiBox Detector Training')
     parser.add_argument('--version', default='v2', help='conv11_2(v2) or pool6(v1) as last layer')
@@ -86,7 +86,7 @@ def main():
     parser.add_argument('--nms_thresh', default=0.45, type=float, help='NMS threshold')
     parser.add_argument('--topk', default=50, type=int, help='topk for evaluation')
     parser.add_argument('--clip_gradient', default=40, type=float, help='gradients clip')
-    parser.add_argument('--resume', default="/data4/lilin/my_code/realtime/saveucf24/ucf101_CONV-SSD-ucf24-rgb-bs-32-vgg16-lr-000050_epoch_1[ Fri Mar  9 15:08:54 2018 ] _checkpoint.pth.tar",type=str, help='Resume from checkpoint')
+    parser.add_argument('--resume', default=None,type=str, help='Resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--epochs', default=35, type=int, metavar='N',
                         help='number of total epochs to run')
@@ -208,6 +208,7 @@ def main():
     # initialize newly added layers' weights with xavier method
     if args.Finetune_SSD is False and args.resume is None:
         print_log(args, "init layers")
+        net.clstm.apply(weights_init)
         net.extras.apply(weights_init)
         net.loc.apply(weights_init)
         net.conf.apply(weights_init)
@@ -217,16 +218,16 @@ def main():
 
     #Set different learning rate to bias layers and set their weight_decay to 0
     for name, param in parameter_dict.items():
-        if args.end2end is False and name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
-            param.requires_grad = False
-            print_log(args, name + 'layer parameters will be fixed')
+        # if args.end2end is False and name.find('vgg') > -1 and int(name.split('.')[1]) < 23:# :and name.find('cell') <= -1
+        #     param.requires_grad = False
+        #     print_log(args, name + 'layer parameters will be fixed')
+        # else:
+        if name.find('bias') > -1:
+            print_log(args, name + 'layer parameters will be trained @ {}'.format(args.lr*2))
+            params += [{'params': [param], 'lr': args.lr*2, 'weight_decay': 0}]
         else:
-            if name.find('bias') > -1:
-                print_log(args, name + 'layer parameters will be trained @ {}'.format(args.lr*2))
-                params += [{'params': [param], 'lr': args.lr*2, 'weight_decay': 0}]
-            else:
-                print_log(args, name + 'layer parameters will be trained @ {}'.format(args.lr))
-                params += [{'params':[param], 'lr': args.lr, 'weight_decay':args.weight_decay}]
+            print_log(args, name + 'layer parameters will be trained @ {}'.format(args.lr))
+            params += [{'params':[param], 'lr': args.lr, 'weight_decay':args.weight_decay}]
 
     optimizer = optim.SGD(params, lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay)
     criterion = MultiBoxLoss(args.num_classes, 0.5, True, 0, True, 3, 0.5, False, args.cuda)
@@ -249,13 +250,6 @@ def main():
     print_log(args, "train epoch_size: " + str(len(train_data_loader)))
     print_log(args, 'Training SSD on' + train_dataset.name)
 
-    my_dict = copy.deepcopy(train_data_loader.dataset.train_vid_frame)
-    keys = list(my_dict.keys())
-    k_len = len(keys)
-    arr = np.arange(k_len)
-    xxx = copy.deepcopy(train_data_loader.dataset.ids)
-    # log_file = open(args.save_root + args.snapshot_pref + "_training_" + day + ".log", "w", 1)
-    # log_file.write()
     print_log(args, args.snapshot_pref)
     for arg in vars(args):
         print(arg, getattr(args, arg))
@@ -318,17 +312,6 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
     loc_losses = AverageMeter()
     cls_losses = AverageMeter()
 
-    #### shuffle ####
-    xxxx = copy.deepcopy(train_data_loader.dataset.ids)
-    np.random.shuffle(arr)
-    iii = 0
-    for arr_i in arr:
-        key = keys[arr_i]
-        rang = my_dict[key]
-        xxxx[iii:(iii + rang[1] - rang[0])] = xxx[rang[0]:rang[1]]
-        iii += rang[1] - rang[0]
-    train_data_loader.dataset.ids = copy.deepcopy(xxxx)
-
     # create batch iterator
     batch_iterator = None
     iter_count = 0
@@ -356,12 +339,13 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
         args.lr = adjust_learning_rate_log_lr(optimizer, epoch, args)
     else:
         args.lr = adjust_learning_rate_step_lr(optimizer, epoch, args)
+
     train_shuffle = []
     ii = 0
     for iteration in range(len(train_data_loader)):
         # ii += 1
         # print (ii)
-        # if ii > 100:
+        # if ii > 2:
         #     break
         if not batch_iterator:
             batch_iterator = iter(train_data_loader)
@@ -370,7 +354,7 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
         train_shuffle.append([images, targets, img_indexs])
 
     random.shuffle(train_shuffle)
-
+    # for iteration, item in enumerate(train_data_loader):
     for iteration, item in enumerate(train_shuffle):
         images = item[0]
         targets = item[1]
@@ -432,6 +416,8 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
                 cc = ('Reset accumulators of ' + args.snapshot_pref + ' at' + str(iter_count * args.print_step))
                 print_log(args, cc)
                 iter_count = 0
+
+    del train_shuffle
 
 
 def validate(args, net, val_data_loader, val_dataset, epoch, iou_thresh=0.5):

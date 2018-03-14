@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="87c7e8fe-445a-49d8-a84c-caa6b0c867bf" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ssd.py" afterPath="$PROJECT_DIR$/ssd.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py" afterPath="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +19,18 @@
       <file leaf-file-name="train_ssd_conv_lstm_step_lr_seq_shuffle.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-70">
-              <caret line="358" column="10" lean-forward="true" selection-start-line="358" selection-start-column="10" selection-end-line="358" selection-end-column="10" />
+            <state relative-caret-position="159">
+              <caret line="342" column="17" lean-forward="false" selection-start-line="342" selection-start-column="10" selection-end-line="342" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ucf24.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data/ucf24.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="206">
+              <caret line="104" column="22" lean-forward="true" selection-start-line="104" selection-start-column="22" selection-end-line="104" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -27,8 +39,8 @@
       <file leaf-file-name="ssd.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ssd.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="138" column="25" lean-forward="false" selection-start-line="138" selection-start-column="23" selection-end-line="138" selection-end-column="25" />
+            <state relative-caret-position="91">
+              <caret line="92" column="26" lean-forward="true" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -45,19 +57,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>log</find>
-      <find>loss_reset_step</find>
-      <find>train(</find>
-      <find>model</find>
-      <find>end2</find>
-      <find>fix</find>
-      <find>lr</find>
-      <find>step</find>
-      <find>0.00</find>
-      <find>hidden</find>
-      <find>epoch</find>
-      <find>'\n'</find>
-      <find>log_lr</find>
       <find>[</find>
       <find>is</find>
       <find>random</find>
@@ -74,7 +73,20 @@
       <find>valid</find>
       <find>best_name</find>
       <find>.for</find>
+      <find>clip</find>
+      <find>rela</find>
+      <find>lstm</find>
+      <find>hidd</find>
+      <find>.data</find>
+      <find>adjust</find>
+      <find>init</find>
+      <find>train_da</find>
+      <find>fixed</find>
       <find>resume</find>
+      <find>deep</find>
+      <find>xx</find>
+      <find>clstm</find>
+      <find>shuffle</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -114,18 +126,19 @@
         <option value="$PROJECT_DIR$/train_loglr.py" />
         <option value="$PROJECT_DIR$/metroplis.py" />
         <option value="$PROJECT_DIR$/data/ucf24.py" />
-        <option value="$PROJECT_DIR$/ssd.py" />
         <option value="$PROJECT_DIR$/train_ssd_end2end.py" />
         <option value="$PROJECT_DIR$/train_ssd_convlstm_end2end.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr.py" />
+        <option value="$PROJECT_DIR$/ssd.py" />
         <option value="$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
+    <option name="y" value="22" />
     <option name="width" value="1920" />
     <option name="height" value="1018" />
   </component>
@@ -144,6 +157,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -158,12 +173,10 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../st-gcn-work/st-gcn-relation-L1" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../realtime-action-detection-plus-lstm" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -365,13 +378,12 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1018" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="22" width="1920" height="1018" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1640625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15364583" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.640592" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.40697673" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -628,13 +640,6 @@
     <entry file="file://$PROJECT_DIR$/train_ssd_end2end.py" />
     <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm.py" />
     <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr_print_log.py" />
-    <entry file="file://$PROJECT_DIR$/data/ucf24.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="687">
-          <caret line="267" column="16" lean-forward="true" selection-start-line="267" selection-start-column="16" selection-end-line="267" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/train_ssd_convlstm_end2end.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="857">
@@ -646,32 +651,37 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="448">
           <caret line="509" column="36" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="537" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_log_lr.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="35" column="0" lean-forward="false" selection-start-line="35" selection-start-column="0" selection-end-line="36" selection-end-column="16" />
-          <folding>
-            <element signature="e#401#410#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="-5508">
+          <caret line="52" column="0" lean-forward="true" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ssd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="138" column="25" lean-forward="false" selection-start-line="138" selection-start-column="23" selection-end-line="138" selection-end-column="25" />
+        <state relative-caret-position="91">
+          <caret line="92" column="26" lean-forward="true" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/ucf24.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="104" column="22" lean-forward="true" selection-start-line="104" selection-start-column="22" selection-end-line="104" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/train_ssd_conv_lstm_step_lr_seq_shuffle.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-70">
-          <caret line="358" column="10" lean-forward="true" selection-start-line="358" selection-start-column="10" selection-end-line="358" selection-end-column="10" />
+        <state relative-caret-position="159">
+          <caret line="342" column="17" lean-forward="false" selection-start-line="342" selection-start-column="10" selection-end-line="342" selection-end-column="17" />
           <folding />
         </state>
       </provider>
