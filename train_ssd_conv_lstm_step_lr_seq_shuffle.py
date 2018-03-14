@@ -19,7 +19,7 @@ import torch.nn.init as init
 import argparse
 from torch.autograd import Variable
 import torch.utils.data as data
-from data import v2, UCF24Detection, AnnotationTransform, detection_collate, CLASSES, BaseTransform
+from data import v2, UCF24Detection, AnnotationTransform, detection_collate, CLASSES, BaseTransform, readsplitfile
 from utils.augmentations import SSDAugmentation
 from layers.modules import MultiBoxLoss
 from ssd import build_ssd
@@ -234,21 +234,42 @@ def main():
 
     scheduler = None
     # scheduler = MultiStepLR(optimizer, milestones=args.step, gamma=args.gamma)
+    rootpath = args.data_root
+    split = 1
+    splitfile = rootpath + 'splitfiles/trainlist{:02d}.txt'.format(split)
+    trainvideos = readsplitfile(splitfile)
+
+    splitfile = rootpath + 'splitfiles/testlist{:02d}.txt'.format(split)
+    testvideos = readsplitfile(splitfile)
+
 
     print_log(args, 'Loading Dataset...')
-    train_dataset = UCF24Detection(args.data_root, args.train_sets, SSDAugmentation(args.ssd_dim, args.means),
-                                   AnnotationTransform(), input_type=args.modality)
+    # train_dataset = UCF24Detection(args.data_root, args.train_sets, SSDAugmentation(args.ssd_dim, args.means),
+    #                                AnnotationTransform(), input_type=args.modality)
+    # val_dataset = UCF24Detection(args.data_root, 'test', BaseTransform(args.ssd_dim, args.means),
+    #                              AnnotationTransform(), input_type=args.modality,
+    #                              full_test=False)
+
+    # train_data_loader = data.DataLoader(train_dataset, args.batch_size, num_workers=args.num_workers,
+    #                               shuffle=False, collate_fn=detection_collate, pin_memory=True)
+    # val_data_loader = data.DataLoader(val_dataset, args.batch_size, num_workers=args.num_workers,
+    #                              shuffle=False, collate_fn=detection_collate, pin_memory=True)
+
+    len_test = len(testvideos)
+    random.shuffle(testvideos)
+    testvideos_temp = testvideos
     val_dataset = UCF24Detection(args.data_root, 'test', BaseTransform(args.ssd_dim, args.means),
                                  AnnotationTransform(), input_type=args.modality,
-                                 full_test=False)
-
-    train_data_loader = data.DataLoader(train_dataset, args.batch_size, num_workers=args.num_workers,
-                                  shuffle=False, collate_fn=detection_collate, pin_memory=True)
+                                 full_test=False,
+                                 videos=testvideos_temp,
+                                 istrain=False)
     val_data_loader = data.DataLoader(val_dataset, args.batch_size, num_workers=args.num_workers,
-                                 shuffle=False, collate_fn=detection_collate, pin_memory=True)
+                                           shuffle=False, collate_fn=detection_collate, pin_memory=True,
+                                           drop_last=True)
 
-    print_log(args, "train epoch_size: " + str(len(train_data_loader)))
-    print_log(args, 'Training SSD on' + train_dataset.name)
+
+    # print_log(args, "train epoch_size: " + str(len(train_data_loader)))
+    # print_log(args, 'Training SSD on' + train_dataset.name)
 
     print_log(args, args.snapshot_pref)
     for arg in vars(args):
@@ -256,9 +277,19 @@ def main():
         print_log(args, str(arg)+': '+str(getattr(args, arg)))
 
     print_log(args, str(net))
-
+    len_train = len(trainvideos)
     torch.cuda.synchronize()
     for epoch in range(args.start_epoch, args.epochs):
+
+        random.shuffle(trainvideos)
+        trainvideos_temp = trainvideos
+        train_dataset = UCF24Detection(args.data_root, 'train', SSDAugmentation(args.ssd_dim, args.means),
+                                       AnnotationTransform(),
+                                       input_type=args.modality,
+                                       videos=trainvideos_temp,
+                                       istrain=True)
+        train_data_loader = data.DataLoader(train_dataset, args.batch_size, num_workers=args.num_workers,
+                                                 shuffle=False, collate_fn=detection_collate, pin_memory=True, drop_last=True)
 
         train(train_data_loader, net, criterion, optimizer, epoch, scheduler)
         print_log(args, 'Saving state, epoch:' + str(epoch))
@@ -342,20 +373,22 @@ def train(train_data_loader, net, criterion, optimizer, epoch, scheduler):
 
     train_shuffle = []
     ii = 0
-    for iteration in range(len(train_data_loader)):
-        # ii += 1
-        # print (ii)
-        # if ii > 2:
-        #     break
-        if not batch_iterator:
-            batch_iterator = iter(train_data_loader)
-        # load train data
-        images, targets, img_indexs = next(batch_iterator)
-        train_shuffle.append([images, targets, img_indexs])
+    print (len(train_data_loader))
 
-    random.shuffle(train_shuffle)
-    # for iteration, item in enumerate(train_data_loader):
-    for iteration, item in enumerate(train_shuffle):
+    # for iteration in range(len(train_data_loader)):
+    #     ii += 1
+    #     print (ii)
+    #     # if ii > 2:
+    #     #     break
+    #     if not batch_iterator:
+    #         batch_iterator = iter(train_data_loader)
+    #     # load train data
+    #     images, targets, img_indexs = next(batch_iterator)
+    #     train_shuffle.append([images, targets, img_indexs])
+
+    # random.shuffle(train_shuffle)
+    for iteration, item in enumerate(train_data_loader):
+    # for iteration, item in enumerate(train_shuffle):
         images = item[0]
         targets = item[1]
         img_indexs = item[2]

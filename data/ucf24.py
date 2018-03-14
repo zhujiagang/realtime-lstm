@@ -65,18 +65,11 @@ def readsplitfile(splitfile):
         trainvideos.append(vid)
     return trainvideos
 
-
-def make_lists(rootpath, imgtype, split=1, fulltest=False):
+def make_lists(rootpath, imgtype, split=1, fulltest=False, videos=None, istrain = True):
     imagesDir = rootpath + imgtype + '/'
-    # splitfile = rootpath + 'splitfiles/trainlist_new.txt'
-    # splitfile_val = rootpath + 'splitfiles/vallist_new.txt'
-    splitfile = rootpath + 'splitfiles/trainlist{:02d}.txt'.format(split)
-    trainvideos = readsplitfile(splitfile)
-    # valvideos = readsplitfile(splitfile_val)
     trainlist = []
     testlist = []
-    import collections
-    train_vid_frame = collections.defaultdict(list)
+
     with open(rootpath + 'splitfiles/pyannot.pkl','rb') as fff:
         database = pickle.load(fff)
 
@@ -86,32 +79,32 @@ def make_lists(rootpath, imgtype, split=1, fulltest=False):
     ratios = np.asarray([1.1,0.8,4.7,1.4,0.9,2.6,2.2,3.0,3.0,5.0,6.2,2.7,3.5,3.1,4.3,2.5,4.5,3.4,6.7,3.6,1.6,3.4,0.6,4.3])
     # ratios = np.ones_like(ratios) #TODO:uncomment this line and line 155, 156 to compute new ratios might be useful for JHMDB21
     video_list = []
-    vid_last = -100
-    train_cnt = 0
-    lock = True
-    for vid, videoname in enumerate(sorted(database.keys())):
+
+    vid = -1
+    # for vid, videoname in enumerate(sorted(database.keys())):
+    for vid_1, videoname in enumerate(videos):
+        if videoname not in sorted(database.keys()):# or ("BasketballD" not in videoname)
+            continue
+
+        vid += 1
         video_list.append(videoname)
         actidx = database[videoname]['label']
-        istrain = True
-        step = ratios[actidx]
-        numf = database[videoname]['numf']
-        lastf = numf-1
-        # if videoname in trainvideos:
-        #     istrain = True
-        # elif videoname in valvideos:
-        #     istrain = False
-        #     step = ratios[actidx]*2.0
-        # else:
-        #     continue
 
-        if videoname not in trainvideos:
-            istrain = False
+        # step = ratios[actidx]
+        numf = database[videoname]['numf']
+        lastf = numf - 1
+
+        if not istrain:
             step = ratios[actidx] * 2.0
+        else:
+            step = ratios[actidx] * 2.0
+
         if fulltest:
             step = 1
             lastf = numf
 
         annotations = database[videoname]['annotations']
+            # annotations = myvideoname[1]['annotations']
         num_tubes = len(annotations)
 
         tube_labels = np.zeros((numf,num_tubes),dtype=np.int16) # check for each tube if present in
@@ -139,7 +132,6 @@ def make_lists(rootpath, imgtype, split=1, fulltest=False):
                 labels = []
                 image_name = imagesDir + videoname+'/{:05d}.jpg'.format(frame_num+1)
                 label_name = rootpath + 'labels/' + videoname + '/{:05d}.txt'.format(frame_num + 1)
-
                 assert os.path.isfile(image_name), 'Image does not exist'+image_name
                 for tubeid, tube in enumerate(annotations):
                     if tube_labels[frame_num, tubeid]>0:
@@ -148,37 +140,24 @@ def make_lists(rootpath, imgtype, split=1, fulltest=False):
                         labels.append(tube_labels[frame_num, tubeid])
 
                 if istrain: # if it is training video
-                    trainlist.append([vid, frame_num+1, np.asarray(labels)-1, np.asarray(all_boxes)])
-                    if vid is not vid_last and lock is False:  # and vid_last > 0
-                        lock = True
-                        if vid_last > 0:
-                            train_vid_frame[str(vid_last)].append(train_cnt)
-
-                    if vid is not vid_last and lock is True:
-                        train_vid_frame[str(vid)].append(train_cnt)
-                        lock = False
-
-                    train_cnt += 1
-                    vid_last = vid
-
+                    trainlist.append([vid, frame_num + 1, np.asarray(labels) - 1, np.asarray(all_boxes)])
                     train_action_counts[actidx] += len(labels)
                 else: # if test video and has micro-tubes with GT
-                    testlist.append([vid, frame_num+1, np.asarray(labels)-1, np.asarray(all_boxes)])
+                    testlist.append([vid, frame_num + 1, np.asarray(labels) - 1, np.asarray(all_boxes)])
+
                     test_action_counts[actidx] += len(labels)
             elif fulltest and not istrain: # if test video with no ground truth and fulltest is trues
-                testlist.append([vid, frame_num+1, np.asarray([9999]), np.zeros((1,4))])
+                 testlist.append([vid, frame_num+1, np.asarray([9999]), np.zeros((1,4))])
 
-    train_vid_frame[str(vid_last)].append(train_cnt)
 
     for actidx, act_count in enumerate(train_action_counts): # just to see the distribution of train and test sets
         print('train {:05d} test {:05d} action {:02d} {:s}'.format(act_count, test_action_counts[actidx] , int(actidx), CLASSES[actidx]))
 
-    # newratios = train_action_counts/4000
-    # print('new   ratios', newratios)
-    # print('older ratios', ratios)
-    print('Trainlistlen', len(trainlist), ' testlist ', len(testlist))
+    print('Trainlistlen', len(trainlist), ' Testlistlen', len(testlist))
 
-    return trainlist, testlist, video_list, train_vid_frame
+    return trainlist, testlist, video_list
+
+
 
 
 class UCF24Detection(data.Dataset):
@@ -187,7 +166,7 @@ class UCF24Detection(data.Dataset):
     """
 
     def __init__(self, root, image_set, transform=None, target_transform=None,
-                 dataset_name='ucf24', input_type='rgb', full_test=False):
+                 dataset_name='ucf24', input_type='rgb', full_test=False, videos=None, istrain = True):
 
         self.input_type = input_type
         input_type = input_type+'-images'
@@ -202,9 +181,8 @@ class UCF24Detection(data.Dataset):
         self.ids = list()
         self.last_vid = []
 
-        trainlist, testlist, video_list, train_vid_frame = make_lists(root, input_type, split=1, fulltest=full_test)
+        trainlist, testlist, video_list = make_lists(root, input_type, split=1, fulltest=full_test, videos = videos, istrain = istrain)
         self.video_list = video_list
-        self.train_vid_frame = train_vid_frame
 
         if self.image_set == 'train':
             self.ids = trainlist

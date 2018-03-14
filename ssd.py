@@ -130,15 +130,15 @@ class SSD(nn.Module):
 
                 yyy = torch.cat(yyy, 0)
                 yyy = F.relu(yyy, inplace=True)
-                x = yyy.view(x.size())
-                return x
+                yyy = yyy.view(x.size())
+                return yyy
             else:
                 xx = x.view(-1, x.size(0), x.size(1), x.size(2), x.size(3))
                 xxx = CLSTM(xx)
                 yyy = xxx[1]
                 yyy = F.relu(yyy, inplace=True)
-                x = yyy.view(x.size())
-                return x
+                yyy = yyy.view(x.size())
+                return yyy
 
         def convgru_forward(x, CGRU, hidden_states, hi):
             len_r = len(reset_group)
@@ -181,13 +181,12 @@ class SSD(nn.Module):
                 #     xxx = CGRU(xx, temp)
                 # else:
                 xxx = CGRU(xx)
-
                 yyy = xxx[1]
                 # hidden_states[hi] = xxx[0][0]
 
-                yyyy = F.relu(yyy, inplace=True)
-                x = yyyy.view(x.size())
-                return x
+                yyy = F.relu(yyy, inplace=True)
+                yyy = yyy.view(x.size())
+                return yyy
 
         hi = 0
         ##  apply convlstm on conv4_3
